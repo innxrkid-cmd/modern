@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import api from '../api/http.js';
 
+const DEPARTMENTS = ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance', 'Operations'];
+const TITLES = ['Software Engineer', 'HR Specialist', 'Sales Executive', 'Marketing Coordinator', 'Finance Analyst', 'Operations Manager'];
+
 function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -89,24 +92,50 @@ function RegisterPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
               Department
-              <input
-                type="text"
-                placeholder="Engineering"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                className="mt-2 w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]"
-              />
+              <div className="relative mt-2">
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  required
+                  className="w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3 pr-10 text-sm text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)] appearance-none cursor-pointer"
+                >
+                  <option value="" disabled className="bg-[#0F172A] text-slate-500">Select Department</option>
+                  {DEPARTMENTS.map((dept) => (
+                    <option key={dept} value={dept} className="bg-[#0F172A] text-slate-100">
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </label>
 
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
               Job Title
-              <input
-                type="text"
-                placeholder="Software Engineer"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="mt-2 w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]"
-              />
+              <div className="relative mt-2">
+                <select
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  className="w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3 pr-10 text-sm text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)] appearance-none cursor-pointer"
+                >
+                  <option value="" disabled className="bg-[#0F172A] text-slate-500">Select Job Title</option>
+                  {TITLES.map((t) => (
+                    <option key={t} value={t} className="bg-[#0F172A] text-slate-100">
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </label>
           </div>
 
