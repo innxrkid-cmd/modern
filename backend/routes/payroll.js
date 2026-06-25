@@ -6,13 +6,15 @@ import {
   getPayrollById,
   updatePayroll,
   markPayrollPaid,
-  deletePayroll
+  deletePayroll,
+  payAllPendingPayroll
 } from '../controllers/payrollController.js';
 
 const router = express.Router();
 
 router.post('/', authenticate, authorizeRoles('admin'), createPayroll);
 router.get('/', authenticate, authorizeRoles('admin', 'employee'), getPayrollRecords);
+router.post('/pay-all', authenticate, authorizeRoles('admin'), payAllPendingPayroll);
 router.get('/:id', authenticate, authorizeRoles('admin', 'employee'), getPayrollById);
 router.put('/:id', authenticate, authorizeRoles('admin'), updatePayroll);
 router.post('/:id/pay', authenticate, authorizeRoles('admin'), markPayrollPaid);

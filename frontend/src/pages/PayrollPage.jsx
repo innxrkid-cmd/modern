@@ -83,11 +83,41 @@ function PayrollPage() {
   };
 
   const formatCurrency = (value) => {
-    if (value == null) return '₹0.00';
-    return `₹${Number(value).toLocaleString()}`;
+    if (value == null) return '$0.00';
+    return `$${Number(value).toLocaleString()}`;
   };
 
   const formatDate = (value) => (value ? new Date(value).toLocaleDateString() : '-');
+
+  const handlePayAll = async () => {
+    setSaving(true);
+    setError('');
+    setInfo('');
+    try {
+      const res = await api.post('/payroll/pay-all');
+      setInfo(res.data.message || 'All pending payrolls processed successfully.');
+      loadPayroll();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to process all payrolls.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePayIndividual = async (id) => {
+    setSaving(true);
+    setError('');
+    setInfo('');
+    try {
+      await api.post(`/payroll/${id}/pay`);
+      setInfo('Payroll processed successfully.');
+      loadPayroll();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to process payroll.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -209,8 +239,20 @@ function PayrollPage() {
         <div className="space-y-6">
           {/* Admin records list */}
           <div className="rounded-[2.5rem] border border-white/5 bg-[#0F172A]/20 p-6 md:p-8 backdrop-blur-md relative overflow-hidden shadow-xl">
-            <span className="text-[10px] uppercase font-bold tracking-[0.24em] text-slate-500">Manager Dashboard</span>
-            <h3 className="text-lg font-bold text-white tracking-tight mt-1 mb-6">All Payroll Ledger Logs</h3>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-[0.24em] text-slate-500">Manager Dashboard</span>
+                <h3 className="text-lg font-bold text-white tracking-tight mt-1">All Payroll Ledger Logs</h3>
+              </div>
+              <button
+                type="button"
+                onClick={handlePayAll}
+                disabled={saving || !records.some(r => r.status === 'pending')}
+                className="self-start sm:self-center rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/10 hover:scale-[1.01] active:scale-[0.99]"
+              >
+                Process All Pending
+              </button>
+            </div>
             
             <div className="overflow-hidden rounded-2xl border border-white/[0.05] bg-slate-950/40">
               <table className="min-w-full text-left text-xs border-collapse">
@@ -235,13 +277,25 @@ function PayrollPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(record)}
-                          className="rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-all duration-300"
-                        >
-                          Edit Salary
-                        </button>
+                        <div className="flex justify-end gap-2">
+                          {record.status === 'pending' && (
+                            <button
+                              type="button"
+                              onClick={() => handlePayIndividual(record._id)}
+                              disabled={saving}
+                              className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-all duration-300 disabled:opacity-50 shadow-md shadow-emerald-500/10 hover:scale-[1.01] active:scale-[0.99]"
+                            >
+                              Give Payroll
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(record)}
+                            className="rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
+                          >
+                            Edit Salary
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -254,6 +308,21 @@ function PayrollPage() {
               </table>
             </div>
           </div>
+
+          <AnimatePresence>
+            {!editRecord && (info || error) && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className={`rounded-2xl border p-4 text-xs font-medium ${
+                  info ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                }`}
+              >
+                {info || error}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Inline Editor Draw Panel */}
           <AnimatePresence>
@@ -283,7 +352,7 @@ function PayrollPage() {
                 <div className="mt-8 grid gap-4 sm:grid-cols-2 relative z-10">
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2.5">
-                      Base Salary (₹)
+                      Base Salary ($)
                     </label>
                     <input
                       type="number"
@@ -294,7 +363,7 @@ function PayrollPage() {
                   </div>
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2.5">
-                      Tax Amount (₹)
+                      Tax Amount ($)
                     </label>
                     <input
                       type="number"

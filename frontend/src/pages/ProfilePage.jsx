@@ -45,7 +45,7 @@ function ProfilePage() {
     { name: 'Signed NDA', status: 'Verified' }
   ];
 
-  const formatCurrency = (value) => `₹${value?.toLocaleString()}`;
+  const formatCurrency = (value) => `$${value?.toLocaleString()}`;
 
   if (loading) {
     return (

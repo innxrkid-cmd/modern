@@ -110,3 +110,15 @@ export const deletePayroll = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const payAllPendingPayroll = async (req, res) => {
+  try {
+    const result = await Payroll.updateMany(
+      { status: 'pending' },
+      { $set: { status: 'paid', paymentDate: new Date() } }
+    );
+    res.json({ message: `Successfully processed ${result.modifiedCount} payroll records.`, count: result.modifiedCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
