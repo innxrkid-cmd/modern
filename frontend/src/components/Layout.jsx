@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import api from '../api/http.js';
 
 const navItems = [
   { label: 'Dashboard', to: '/dashboard' },
@@ -16,6 +18,20 @@ function Layout() {
 
   const user = JSON.parse(localStorage.getItem('hrms_user') || '{}');
   const isAdmin = user.role === 'admin';
+
+  const [teamSize, setTeamSize] = useState(0);
+
+  useEffect(() => {
+    if (!isAuthRoute && localStorage.getItem('hrms_token')) {
+      api.get('/employees/count')
+        .then((res) => {
+          setTeamSize(res.data.count);
+        })
+        .catch((err) => {
+          console.error('Failed to fetch employee count:', err);
+        });
+    }
+  }, [isAuthRoute, location.pathname]);
 
   const filteredNavItems = navItems.filter((item) => {
     if (item.to === '/employees' && !isAdmin) return false;
@@ -102,7 +118,7 @@ function Layout() {
             <div className="space-y-2">
               <div className="rounded-2xl bg-slate-950/40 border border-white/[0.04] p-3 flex items-center justify-between text-xs">
                 <span className="text-slate-400">Team Size</span>
-                <span className="font-semibold text-white">20+</span>
+                <span className="font-semibold text-white">{teamSize}</span>
               </div>
               <div className="rounded-2xl bg-slate-950/40 border border-white/[0.04] p-3 flex items-center justify-between text-xs">
                 <span className="text-slate-400">Database</span>
