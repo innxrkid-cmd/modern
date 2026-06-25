@@ -8,7 +8,8 @@ const navItems = [
   { label: 'Employees', to: '/employees' },
   { label: 'Attendance', to: '/attendance' },
   { label: 'Leave', to: '/leave' },
-  { label: 'Payroll', to: '/payroll' }
+  { label: 'Payroll', to: '/payroll' },
+  { label: 'Announcements', to: '/announcements' }
 ];
 
 function Layout() {

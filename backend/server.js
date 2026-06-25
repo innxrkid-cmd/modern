@@ -8,6 +8,7 @@ import userRoutes from './routes/users.js';
 import attendanceRoutes from './routes/attendance.js';
 import leaveRoutes from './routes/leave.js';
 import payrollRoutes from './routes/payroll.js';
+import announcementRoutes from './routes/announcements.js';
 
 dotenv.config();
 const app = express();
@@ -24,6 +25,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/leaves', leaveRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/employees', employeeRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

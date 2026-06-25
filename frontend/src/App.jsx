@@ -10,6 +10,7 @@ import LeavePage from './pages/LeavePage.jsx';
 import PayrollPage from './pages/PayrollPage.jsx';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 import LandingPage from './pages/LandingPage.jsx';
+import AnnouncementsPage from './pages/AnnouncementsPage.jsx';
 
 function App() {
   return (
@@ -63,6 +64,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PayrollPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="announcements"
+          element={
+            <ProtectedRoute>
+              <AnnouncementsPage />
             </ProtectedRoute>
           }
         />
