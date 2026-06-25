@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/http.js';
 
 const leaveTypes = [
@@ -9,9 +10,9 @@ const leaveTypes = [
 ];
 
 const statusStyles = {
-  pending: 'bg-amber-500/15 text-amber-300',
-  approved: 'bg-emerald-500/15 text-emerald-300',
-  rejected: 'bg-rose-500/15 text-rose-300'
+  pending: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+  approved: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+  rejected: 'bg-rose-500/10 border-rose-500/20 text-rose-400'
 };
 
 function LeavePage() {
@@ -115,9 +116,9 @@ function LeavePage() {
   const chartItems = useMemo(() => {
     const total = summary.total || 1;
     return [
-      { label: 'Approved', value: summary.approved, color: 'bg-emerald-400' },
-      { label: 'Pending', value: summary.pending, color: 'bg-amber-400' },
-      { label: 'Rejected', value: summary.rejected, color: 'bg-rose-400' }
+      { label: 'Approved', value: summary.approved, color: 'from-emerald-500 to-teal-500' },
+      { label: 'Pending', value: summary.pending, color: 'from-amber-500 to-orange-500' },
+      { label: 'Rejected', value: summary.rejected, color: 'from-rose-500 to-red-500' }
     ].map((item) => ({
       ...item,
       pct: Math.round((item.value / total) * 100)
@@ -125,126 +126,194 @@ function LeavePage() {
   }, [summary]);
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold text-white">Leave Requests</h1>
-          <p className="mt-2 text-slate-400">Submit leave plans and monitor approval status with actionable insights.</p>
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="space-y-8"
+    >
+      {/* Page Header */}
+      <div className="relative rounded-[2rem] border border-white/5 bg-[#0F172A]/40 p-6 md:p-8 backdrop-blur-xl shadow-2xl overflow-hidden glow-violet">
+        <div className="absolute -inset-px rounded-[2rem] bg-gradient-to-tr from-violet-500/10 via-transparent to-blue-500/10 opacity-70 pointer-events-none" />
+        
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between relative z-10">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-violet-400">Time-off Manager</span>
+            <h2 className="mt-2 text-3xl font-extrabold text-white tracking-tight">Leave Planner</h2>
+            <p className="mt-2 text-sm text-slate-400 max-w-xl leading-relaxed">
+              Book your holidays, review historical request channels, and manage employee leave approvals.
+            </p>
+          </div>
+          
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard')}
+            className="self-start md:self-auto rounded-2xl bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 px-5 py-3 text-xs font-bold text-white tracking-wider uppercase transition-all duration-300"
+          >
+            Dashboard
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => navigate('/dashboard')}
-          className="rounded-3xl bg-slate-800 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-700"
-        >
-          Back to dashboard
-        </button>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.9fr]">
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl shadow-slate-950/20">
-          <div className="flex items-center justify-between gap-4">
+      <div className="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
+        
+        {/* Left Side: Submit Request */}
+        <section className="rounded-[2.5rem] border border-white/5 bg-[#0F172A]/20 p-6 md:p-8 backdrop-blur-md relative overflow-hidden shadow-xl">
+          <div className="absolute -inset-px bg-gradient-to-tr from-violet-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+          
+          <div className="flex items-center justify-between gap-4 relative z-10">
             <div>
-              <p className="text-sm uppercase tracking-[0.24em] text-slate-500">New request</p>
-              <h2 className="mt-2 text-xl font-semibold text-white">Submit leave request</h2>
+              <span className="text-[10px] uppercase font-bold tracking-[0.24em] text-slate-500">Form Request</span>
+              <h3 className="text-lg font-bold text-white tracking-tight mt-1">Submit Application</h3>
             </div>
-            <span className="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-300">
-              {summary.total} total
+            <span className="rounded-full bg-slate-900 border border-white/[0.04] px-3.5 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              {summary.total} Total
             </span>
           </div>
 
-          <form className="mt-6 space-y-5" onSubmit={submitRequest}>
-            <label className="block text-sm font-medium text-slate-300">
-              Leave type
+          <form className="mt-8 space-y-6 relative z-10" onSubmit={submitRequest}>
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2.5">
+                Leave Type
+              </label>
               <select
                 value={leaveType}
                 onChange={(e) => setLeaveType(e.target.value)}
-                className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100"
+                className="w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-violet-500 transition-all cursor-pointer"
               >
                 {leaveTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
+                  <option key={type.value} value={type.value} className="bg-slate-950 text-slate-100 text-xs">
                     {type.label}
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block text-sm font-medium text-slate-300">
-                Start date
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2.5">
+                  Start Date
+                </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                   required
-                  className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100"
+                  className="w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-violet-500 transition-all"
                 />
-              </label>
-              <label className="block text-sm font-medium text-slate-300">
-                End date
+              </div>
+              
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2.5">
+                  End Date
+                </label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                   required
-                  className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100"
+                  className="w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-violet-500 transition-all"
                 />
-              </label>
+              </div>
             </div>
 
-            <label className="block text-sm font-medium text-slate-300">
-              Remarks
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2.5">
+                Remarks
+              </label>
               <textarea
                 rows="4"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
-                className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100"
+                placeholder="Reason for requesting time off..."
+                className="w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-violet-500 transition-all resize-none"
               />
-            </label>
+            </div>
 
-            {info && <div className="rounded-3xl bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{info}</div>}
-            {error && <div className="rounded-3xl bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{error}</div>}
+            <AnimatePresence>
+              {info && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-xs font-medium text-emerald-400"
+                >
+                  {info}
+                </motion.div>
+              )}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-xs font-medium text-rose-400"
+                >
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex w-full items-center justify-center rounded-3xl bg-sky-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs tracking-wider uppercase py-4 px-6 transition duration-300 shadow-lg shadow-indigo-600/10 disabled:opacity-50"
             >
-              {saving ? 'Submitting...' : 'Submit request'}
+              {saving ? 'Submitting Shift...' : 'Submit Request'}
             </button>
           </form>
         </section>
 
+        {/* Right Side: Overview Cards */}
         <aside className="space-y-6">
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl shadow-slate-950/20">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Request status</p>
-            <h2 className="mt-2 text-xl font-semibold text-white">Overview</h2>
-            <div className="mt-6 grid gap-4">
-              <div className="rounded-3xl bg-slate-950/80 p-4">
-                <div className="flex items-center justify-between text-sm text-slate-300">
-                  <span>Total requests</span>
-                  <span>{summary.total}</span>
+          <div className="rounded-[2.5rem] border border-white/5 bg-[#0F172A]/20 p-6 md:p-8 backdrop-blur-md relative overflow-hidden shadow-xl">
+            <span className="text-[10px] uppercase font-bold tracking-[0.24em] text-slate-500">Allowances</span>
+            <h3 className="text-lg font-bold text-white tracking-tight mt-1 mb-6">Status Overview</h3>
+            
+            <div className="grid gap-4">
+              <div className="rounded-2xl bg-slate-950/60 border border-white/[0.04] p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase text-slate-500">Total Applications</p>
+                  <p className="mt-1 text-2xl font-black text-white">{summary.total}</p>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-xs font-bold text-slate-400">
+                  #
                 </div>
               </div>
-              <div className="rounded-3xl bg-slate-950/80 p-4">
-                <div className="flex items-center justify-between text-sm text-slate-300">
-                  <span>Approval rate</span>
-                  <span>{summary.total ? Math.round((summary.approved / summary.total) * 100) : 0}%</span>
+              
+              <div className="rounded-2xl bg-slate-950/60 border border-white/[0.04] p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase text-slate-500">Approval Rate</p>
+                  <p className="mt-1 text-2xl font-black text-emerald-400">
+                    {summary.total ? Math.round((summary.approved / summary.total) * 100) : 0}%
+                  </p>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs font-bold text-emerald-400">
+                  %
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl shadow-slate-950/20">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Status mix</p>
-            <div className="mt-6 space-y-3">
+          <div className="rounded-[2.5rem] border border-white/5 bg-[#0F172A]/20 p-6 md:p-8 backdrop-blur-md relative overflow-hidden shadow-xl">
+            <span className="text-[10px] uppercase font-bold tracking-[0.24em] text-slate-500">Distributions</span>
+            <h3 className="text-lg font-bold text-white tracking-tight mt-1 mb-6">Status Mix</h3>
+            
+            <div className="space-y-4">
               {chartItems.map((item) => (
-                <div key={item.label} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm text-slate-300">
-                    <span>{item.label}</span>
-                    <span>{item.value}</span>
+                <div key={item.label} className="rounded-2xl bg-slate-950/60 border border-white/[0.04] p-4">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-slate-300">{item.label}</span>
+                    <span className="rounded-full bg-slate-900 border border-white/[0.03] px-2.5 py-0.5 text-[10px] font-bold text-slate-400">
+                      {item.value}
+                    </span>
                   </div>
-                  <div className="h-3 rounded-full bg-slate-800">
-                    <div className={`${item.color} h-full rounded-full`} style={{ width: `${item.pct}%` }} />
+                  
+                  {/* Progress Line */}
+                  <div className="mt-3.5 h-1.5 w-full rounded-full bg-white/[0.03] overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full bg-gradient-to-r ${item.color}`} 
+                      style={{ width: `${item.pct}%` }}
+                    />
                   </div>
                 </div>
               ))}
@@ -253,154 +322,180 @@ function LeavePage() {
         </aside>
       </div>
 
+      {/* Admin Tab Switching */}
       {isAdmin && (
-        <div className="flex gap-4 border-b border-slate-800 pb-2">
+        <div className="flex gap-2 bg-slate-950/60 border border-white/5 rounded-2xl p-1.5 w-fit relative z-10 backdrop-blur-sm">
           <button
             type="button"
             onClick={() => setActiveTab('personal')}
-            className={`pb-2 text-sm font-semibold tracking-wide transition ${
-              activeTab === 'personal' ? 'border-b-2 border-sky-500 text-sky-400' : 'text-slate-400 hover:text-slate-200'
+            className={`rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+              activeTab === 'personal'
+                ? 'bg-white/[0.06] border border-white/10 text-white shadow-lg shadow-black/20'
+                : 'text-slate-500 hover:text-slate-300'
             }`}
           >
-            Your Leave History
+            Your History
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('employee')}
-            className={`pb-2 text-sm font-semibold tracking-wide transition ${
-              activeTab === 'employee' ? 'border-b-2 border-sky-500 text-sky-400' : 'text-slate-400 hover:text-slate-200'
+            className={`rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+              activeTab === 'employee'
+                ? 'bg-white/[0.06] border border-white/10 text-white shadow-lg shadow-black/20'
+                : 'text-slate-500 hover:text-slate-300'
             }`}
           >
-            Employee Leave Requests
+            Employee Leaves
           </button>
         </div>
       )}
 
-      {activeTab === 'personal' ? (
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl shadow-slate-950/20">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Recent requests</p>
-              <h2 className="mt-2 text-xl font-semibold text-white">Your latest leave history</h2>
+      {/* Listing Content Tabs */}
+      <AnimatePresence mode="wait">
+        {activeTab === 'personal' ? (
+          <motion.section
+            key="personal"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="rounded-[2.5rem] border border-white/5 bg-[#0F172A]/20 p-6 md:p-8 backdrop-blur-md relative overflow-hidden shadow-xl"
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-[0.24em] text-slate-500">Personal Logs</span>
+                <h3 className="text-lg font-bold text-white tracking-tight mt-1">Leave Requests History</h3>
+              </div>
+              <span className="rounded-full bg-slate-900 border border-white/[0.04] px-3.5 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                {summary.total} entries
+              </span>
             </div>
-            <div className="rounded-3xl bg-slate-950/80 px-4 py-2 text-sm text-slate-300">
-              {summary.total} requests total
-            </div>
-          </div>
 
-          <div className="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/80">
-            <table className="min-w-full text-left text-sm">
-              <thead className="bg-slate-900 text-slate-400">
-                <tr>
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Date range</th>
-                  <th className="px-4 py-3">Remarks</th>
-                  <th className="px-4 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="4" className="px-4 py-6 text-center text-slate-400">Loading requests...</td>
+            <div className="mt-6 overflow-hidden rounded-2xl border border-white/[0.05] bg-slate-950/40">
+              <table className="min-w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-white/[0.04] bg-slate-950/80 text-slate-500">
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Type</th>
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Date range</th>
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Remarks</th>
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Status</th>
                   </tr>
-                ) : requests.length === 0 ? (
-                  <tr>
-                    <td colSpan="4" className="px-4 py-6 text-center text-slate-400">No leave requests submitted yet.</td>
-                  </tr>
-                ) : (
-                  requests.map((request) => (
-                    <tr key={request._id} className="border-t border-slate-800 hover:bg-slate-950/50">
-                      <td className="px-4 py-4 capitalize text-slate-100">{request.leaveType}</td>
-                      <td className="px-4 py-4 text-slate-300">{new Date(request.startDate).toLocaleDateString()} - {new Date(request.endDate).toLocaleDateString()}</td>
-                      <td className="px-4 py-4 text-slate-300">{request.reason || 'No remarks'}</td>
-                      <td className="px-4 py-4">
-                        <span className={`rounded-full px-3 py-1 text-xs uppercase ${statusStyles[request.status]}`}>
-                          {request.status}
-                        </span>
-                      </td>
+                </thead>
+                <tbody className="divide-y divide-white/[0.02]">
+                  {loading ? (
+                    <tr>
+                      <td colSpan="4" className="px-6 py-10 text-center text-xs text-slate-500">Loading history logs...</td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      ) : (
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl shadow-slate-950/20">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Employee Requests</p>
-              <h2 className="mt-2 text-xl font-semibold text-white">All employee leave applications</h2>
+                  ) : requests.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" className="px-6 py-10 text-center text-xs text-slate-500">No time-off requests submitted yet.</td>
+                    </tr>
+                  ) : (
+                    requests.map((request) => (
+                      <tr key={request._id} className="hover:bg-white/[0.01] transition-all duration-150">
+                        <td className="px-6 py-4 font-bold capitalize text-slate-200">{request.leaveType} Leave</td>
+                        <td className="px-6 py-4 text-slate-400">
+                          {new Date(request.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} &ndash; {new Date(request.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </td>
+                        <td className="px-6 py-4 text-slate-400 max-w-[280px] truncate">{request.reason || 'No remarks'}</td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-block rounded-full border px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider ${statusStyles[request.status]}`}>
+                            {request.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-            <div className="rounded-3xl bg-slate-950/80 px-4 py-2 text-sm text-slate-300">
-              {employeeRequests.length} requests total
+          </motion.section>
+        ) : (
+          <motion.section
+            key="employee"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="rounded-[2.5rem] border border-white/5 bg-[#0F172A]/20 p-6 md:p-8 backdrop-blur-md relative overflow-hidden shadow-xl"
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-[0.24em] text-slate-500">Company Logs</span>
+                <h3 className="text-lg font-bold text-white tracking-tight mt-1">Leave applications</h3>
+              </div>
+              <span className="rounded-full bg-slate-900 border border-white/[0.04] px-3.5 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                {employeeRequests.length} pending list
+              </span>
             </div>
-          </div>
 
-          <div className="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/80">
-            <table className="min-w-full text-left text-sm">
-              <thead className="bg-slate-900 text-slate-400">
-                <tr>
-                  <th className="px-4 py-3">Employee</th>
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Date range</th>
-                  <th className="px-4 py-3">Remarks</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="6" className="px-4 py-6 text-center text-slate-400">Loading requests...</td>
+            <div className="mt-6 overflow-hidden rounded-2xl border border-white/[0.05] bg-slate-950/40">
+              <table className="min-w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-white/[0.04] bg-slate-950/80 text-slate-500">
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Employee</th>
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Type</th>
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Date range</th>
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Remarks</th>
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 font-bold uppercase tracking-wider">Actions</th>
                   </tr>
-                ) : employeeRequests.length === 0 ? (
-                  <tr>
-                    <td colSpan="6" className="px-4 py-6 text-center text-slate-400">No leave requests found.</td>
-                  </tr>
-                ) : (
-                  employeeRequests.map((request) => (
-                    <tr key={request._id} className="border-t border-slate-800 hover:bg-slate-950/50">
-                      <td className="px-4 py-4 text-slate-100 font-medium">{request.user?.name || 'Unknown'}</td>
-                      <td className="px-4 py-4 capitalize text-slate-300">{request.leaveType}</td>
-                      <td className="px-4 py-4 text-slate-300">{new Date(request.startDate).toLocaleDateString()} - {new Date(request.endDate).toLocaleDateString()}</td>
-                      <td className="px-4 py-4 text-slate-300">{request.reason || 'No remarks'}</td>
-                      <td className="px-4 py-4">
-                        <span className={`rounded-full px-3 py-1 text-xs uppercase ${statusStyles[request.status]}`}>
-                          {request.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
-                        {request.status === 'pending' ? (
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleApprove(request._id)}
-                              className="rounded-2xl bg-emerald-500 px-3 py-1 text-xs font-semibold text-slate-950 transition hover:bg-emerald-400"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleReject(request._id)}
-                              className="rounded-2xl bg-rose-500 px-3 py-1 text-xs font-semibold text-slate-950 transition hover:bg-rose-400"
-                            >
-                              Reject
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-slate-500">-</span>
-                        )}
-                      </td>
+                </thead>
+                <tbody className="divide-y divide-white/[0.02]">
+                  {loading ? (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-10 text-center text-xs text-slate-500">Loading requests directory...</td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-    </div>
+                  ) : employeeRequests.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-10 text-center text-xs text-slate-500">No leave requests found.</td>
+                    </tr>
+                  ) : (
+                    employeeRequests.map((request) => (
+                      <tr key={request._id} className="hover:bg-white/[0.01] transition-all duration-150">
+                        <td className="px-6 py-4 font-bold text-slate-100">{request.user?.name || 'Unknown User'}</td>
+                        <td className="px-6 py-4 capitalize text-slate-300">{request.leaveType}</td>
+                        <td className="px-6 py-4 text-slate-400">
+                          {new Date(request.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} &ndash; {new Date(request.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </td>
+                        <td className="px-6 py-4 text-slate-400 max-w-[200px] truncate">{request.reason || 'No remarks'}</td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-block rounded-full border px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider ${statusStyles[request.status]}`}>
+                            {request.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {request.status === 'pending' ? (
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleApprove(request._id)}
+                                className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white transition-all duration-300"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleReject(request._id)}
+                                className="rounded-xl bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-300 transition-all duration-300"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] text-slate-500">&mdash;</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </motion.section>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 

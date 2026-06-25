@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import api from '../api/http.js';
 
 function LoginPage() {
@@ -28,95 +29,79 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(148,163,184,0.12),_transparent_25%),#0f172a] px-6 py-10 sm:px-8">
-      <div className="mx-auto flex max-w-6xl flex-col gap-12 overflow-hidden rounded-[2rem] border border-slate-800/80 bg-slate-950/95 shadow-2xl shadow-slate-950/40 lg:flex-row lg:items-center">
-        <section className="relative flex-1 bg-slate-900/90 p-10 text-slate-100 sm:p-14 lg:p-16">
-          <div className="absolute inset-y-0 left-0 w-1/2 bg-sky-500/5 blur-2xl" />
-          <div className="relative z-10">
-            <span className="inline-flex rounded-full bg-sky-500/10 px-3 py-1 text-sm font-semibold text-sky-300 ring-1 ring-sky-500/20">
-              Modern HRMS
-            </span>
-            <h1 className="mt-8 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-              Secure human resource management,
-              <span className="text-sky-400"> powered by smart workflows.</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-slate-400 sm:text-lg">
-              Manage employee profiles, attendance, leave requests, and payroll from a single secure system.
-              Sign in to get instant access to your HR dashboard and analytics.
-            </p>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/80 p-5 shadow-lg shadow-slate-950/10">
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Fast login</p>
-                <p className="mt-3 text-xl font-semibold text-white">Email and password</p>
-              </div>
-              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/80 p-5 shadow-lg shadow-slate-950/10">
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Admin ready</p>
-                <p className="mt-3 text-xl font-semibold text-white">Role-based access controls</p>
-              </div>
-            </div>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4 }}
+      className="w-full max-w-lg mx-auto"
+    >
+      <div className="relative rounded-[2rem] border border-white/5 bg-[#0F172A]/40 p-8 md:p-10 shadow-2xl backdrop-blur-xl overflow-hidden glow-violet">
+        <div className="absolute -inset-px rounded-[2rem] bg-gradient-to-tr from-violet-500/10 via-transparent to-blue-500/10 opacity-70 pointer-events-none" />
+        
+        <div className="mb-8 text-center sm:text-left">
+          <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-violet-400">Welcome Back</span>
+          <h2 className="mt-2 text-3xl font-extrabold text-white tracking-tight">Sign in to Dayflow</h2>
+          <p className="mt-2 text-xs text-slate-400">Enter your employee credentials to access your dashboard.</p>
+        </div>
+
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Email Address
+              <input
+                type="email"
+                placeholder="you@company.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-2 w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]"
+              />
+            </label>
+
+            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Password
+              <input
+                type="password"
+                placeholder="••••••••"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-2 w-full rounded-2xl border border-white/5 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]"
+              />
+            </label>
           </div>
-        </section>
 
-        <section className="flex-1 p-8 sm:p-10 lg:p-14">
-          <div className="mx-auto max-w-md rounded-[2rem] border border-slate-800/80 bg-slate-900/90 p-8 shadow-2xl shadow-slate-950/20">
-            <div className="mb-8">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-300">Welcome back</p>
-              <h2 className="mt-4 text-3xl font-semibold text-white">Sign in to your account</h2>
-              <p className="mt-3 text-sm text-slate-400">Enter your employee credentials to continue.</p>
-            </div>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-xs text-rose-300"
+            >
+              {error}
+            </motion.div>
+          )}
 
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="space-y-5">
-                <label className="block text-sm font-medium text-slate-300">
-                  Email address
-                  <input
-                    type="email"
-                    placeholder="you@company.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100 shadow-[inset_0_1px_2px_rgba(15,23,42,0.4)] transition focus:border-sky-400"
-                  />
-                </label>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3.5 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 hover:shadow-violet-500/35 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Authenticating...' : 'Sign In'}
+          </button>
+        </form>
 
-                <label className="block text-sm font-medium text-slate-300">
-                  Password
-                  <input
-                    type="password"
-                    placeholder="Enter your password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100 shadow-[inset_0_1px_2px_rgba(15,23,42,0.4)] transition focus:border-sky-400"
-                  />
-                </label>
-              </div>
-
-              {error && (
-                <div className="rounded-3xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex w-full items-center justify-center rounded-3xl bg-sky-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {loading ? 'Signing in...' : 'Sign In'}
-              </button>
-            </form>
-
-            <div className="mt-6 text-center text-sm text-slate-500">
-              Don&apos;t have an account?{' '}
-              <button type="button" onClick={() => navigate('/register')} className="font-semibold text-slate-100 transition hover:text-sky-300">
-                Register here
-              </button>
-            </div>
-          </div>
-        </section>
+        <div className="mt-8 border-t border-slate-900 pt-5 text-center text-xs text-slate-500">
+          Don&apos;t have an account?{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/register')}
+            className="font-bold text-violet-400 hover:text-violet-300 transition"
+          >
+            Register here
+          </button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

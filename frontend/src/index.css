@@ -7,9 +7,57 @@
 }
 
 body {
-  @apply min-h-screen bg-slate-950 text-slate-100 antialiased;
+  @apply min-h-screen bg-[#020617] text-slate-100 antialiased selection:bg-violet-500/80 selection:text-white;
 }
 
-button, input, textarea {
-  @apply outline-none focus:ring-2 focus:ring-sky-500;
+/* Custom Design System Utilities */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.glass-card-hover {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:border-white/10 hover:shadow-lg hover:shadow-violet-500/5;
+}
+
+.btn-premium {
+  @apply relative overflow-hidden rounded-full bg-gradient-to-r from-violet-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 hover:shadow-violet-600/35 transition-all hover:scale-[1.02] active:scale-[0.98];
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-violet-400 via-indigo-300 to-blue-400 bg-clip-text text-transparent;
+}
+
+.glow-violet {
+  box-shadow: 0 0 24px 0 rgba(139, 92, 246, 0.12);
+}
+.glow-blue {
+  box-shadow: 0 0 24px 0 rgba(37, 99, 235, 0.12);
+}
+.glow-cyan {
+  box-shadow: 0 0 24px 0 rgba(6, 182, 212, 0.12);
+}
+
+/* Custom Scrollbar for premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
